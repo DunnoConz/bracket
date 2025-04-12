@@ -17,8 +17,10 @@ for test_file in $TEST_FILES; do
     echo "Running: $test_file"
     TOTAL=$((TOTAL + 1))
     
-    # Run the test
+    # Run the test with environment variable set
+    export BRACKET_ENV=LUNE
     lune run "$test_file"
+    unset BRACKET_ENV # Unset after run
     
     # Check result
     if [ $? -eq 0 ]; then

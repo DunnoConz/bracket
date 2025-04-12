@@ -1,10 +1,25 @@
 --!strict
 
-local Environment = require("./Environment")
-local Pair = require("../Core/Pair")
-local Error = require("../Core/Error")
-local Macro = require("./Macro")
-local LambdaModule = require("./lambda")
+-- Check environment using BRACKET_ENV variable (set in run_tests.sh for Lune)
+local process = require("@lune/process")
+local isLuneTest = process.env.BRACKET_ENV == "LUNE"
+
+-- Import Util.Require differently based on environment
+local Require
+if not isLuneTest then
+	-- Assume Roblox environment if not explicitly Lune test
+	Require = require(script.Parent.Parent.Util.Require) -- Roblox path
+else
+	-- Use Lune path if BRACKET_ENV is set
+	Require = require("../Util/Require") -- Lune path (relative to src/Evaluator)
+end
+
+-- Import dependencies using the environment-agnostic require
+local Environment = Require.require("Evaluator.Environment")
+local Pair = Require.require("Core.Pair")
+local Error = Require.require("Core.Error")
+local Macro = Require.require("Evaluator.Macro")
+local LambdaModule = Require.require("Evaluator.lambda")
 
 -- Export the Evaluator module
 local Evaluator = {}

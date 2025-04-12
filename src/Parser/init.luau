@@ -1,7 +1,22 @@
 --!strict
 
-local Pair = require("../Core/Pair")
-local Error = require("../Core/Error")
+-- Check environment using BRACKET_ENV variable (set in run_tests.sh for Lune)
+local process = require("@lune/process")
+local isLuneTest = process.env.BRACKET_ENV == "LUNE"
+
+-- Import Util.Require differently based on environment
+local Require
+if not isLuneTest then
+	-- Assume Roblox environment if not explicitly Lune test
+	Require = require(script.Parent.Parent.Util.Require) -- Roblox path
+else
+	-- Use Lune path if BRACKET_ENV is set
+	Require = require("../Util/Require") -- Lune path (relative to src/Parser)
+end
+
+-- Import dependencies using the environment-agnostic require
+local Pair = Require.require("Core.Pair")
+local Error = Require.require("Core.Error")
 
 -- Type definitions for DOD AST
 type NodeType = "SYMBOL" | "NUMBER" | "STRING" | "BOOLEAN" | "LIST" | "NIL"
@@ -223,54 +238,5 @@ end
 
 -- Make the tokenize function public
 Parser.tokenize = tokenize
-
--- Add more debug output for lists
-local function convert_to_scheme_helper(node, node_index, nodes)
-    -- Handle basic types
-    local node_type = nodes[node_index].type
-    local node_value = nodes[node_index].value
-    
-    -- Debug output for node conversion
-    print("DEBUG: Converting node", node_index, "type =", node_type, "value =", node_value)
-    
-    if node_type == "NUMBER" then
-        return tonumber(node_value)
-    elseif node_type == "SYMBOL" then
-        return node_value
-    elseif node_type == "STRING" then
-        return "STRING:" .. node_value
-    elseif node_type == "BOOLEAN" then
-        return node_value == "true"
-    elseif node_type == "LIST" then
-        -- For list nodes, construct a proper list
-        local list_node = nodes[node_index]
-        local start_index = list_node.children[1]
-        local child_count = #list_node.children
-        
-        print("DEBUG: List range start =", start_index, "count =", child_count)
-        
-        -- Process the list in reverse to construct pairs
-        local current_list = nil
-        for i = child_count, 1, -1 do
-            local child_index = list_node.children[i]
-            print("DEBUG: Processing list item", i, "child_index =", child_index)
-            
-            -- Convert the child
-            local child_value = convert_to_scheme_helper(child_index, nodes)
-            
-            -- Debug output
-            print("DEBUG: After conversion, child_value =", child_value)
-            
-            -- Create a new pair with this child as car and current list as cdr
-            current_list = Pair.cons(child_value, current_list)
-            print("DEBUG: After cons, current_list =", current_list)
-        end
-        
-        return current_list
-    else
-        -- Handle other node types as needed
-        return nil
-    end
-end
 
 return Parser 
