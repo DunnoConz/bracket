@@ -1,0 +1,46 @@
+# Luau / Roblox specific
+*.rbxl
+*.rbxlx
+*.rbxm
+*.rbxmx
+
+# Package managers
+Packages/
+_Packages/
+roblox_packages/
+lune_packages/
+luau_packages/
+node_modules/
+
+# Build Tools & Artifacts
+*.zip
+*.tar
+*.log
+*.lock
+build/
+dist/
+out/
+
+# PESDE
+.pesde/
+pesde.lock
+*.pesds
+
+# Rojo
+sourcemap.json
+*.project.json
+!default.project.json # Often kept for default Rojo config
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# Editor specific
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# Secrets / Sensitive Data (if any)
+.env
+*.env 
